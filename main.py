@@ -10,9 +10,9 @@
 # Created date: Dec 26, 2017
 # Last modified: Jan 05, 2018
 # Tested with : Python 2.7
-# Script Revision: 0.6
-# From revision 0.5 threading and statistics was added
-#
+# Script Revision: 0.7
+# Revision 0.6 threading and statistics was added
+# Revision 0.7 differrent router with cost was added
 ##########################################################
 
 
@@ -31,6 +31,7 @@ args = parser.parse_args()
 
 start_time = args.start_time
 end_time = args.end_time
+routers = {'a': ['10.78.99.196', 2], 'b': ['10.78.99.195', 1]}
 
 
 bad_numbers = 0
@@ -59,6 +60,7 @@ def main_job(data_list):
     global bad_numbers
     global good_numbers
     global data_list_len
+    global routers
     data_list_len = len(data_list[0:])
     while data_list[0] != "":
         if int(len(data_list[0])) < 11:
@@ -66,7 +68,8 @@ def main_job(data_list):
             bad_numbers += 1
             data_list.remove(data_list[0])
         else:
-            file_create_logic(data_list[0], start_time, end_time)
+            router_ip, routers = get_router_ip(routers)
+            file_create_logic(data_list[0], start_time, end_time, router_ip)
             good_numbers = good_numbers + 1
             data_list.remove(data_list[0])
 
@@ -76,7 +79,7 @@ def main():
         read_data = file.read()
     data_list = read_data.split()
     start_new_thread(net_thread, ())
-    start_new_thread(main_job(data_list),)
+    start_new_thread(main_job(data_list), ())
 
 
 if __name__ == "__main__":

@@ -5,24 +5,12 @@ import subprocess
 import logging
 import argparse
 
-parser = argparse.ArgumentParser(prog='obzvon')
-parser.add_argument('--number', dest='file_path', type=str, help='File with numbers')
-parser.add_argument('--start_time', dest='start_time', type=int, help='End Time')
-parser.add_argument('--end_time', dest='end_time', type=int, help='End Time')
-
-args = parser.parse_args()
-start_time = args.start_time
-end_time = args.end_time
-
-data_list_len = []
-
-
 logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s', filename="obzvon.log", level=logging.INFO)
 
 
-def create_call_file(number):
+def create_call_file(number, router_ip):
     new_file = open('/var/spool/asterisk/outgoing/%s' % number, 'w+')
-    new_file.write('''Channel: SIP/10.78.99.196/%s
+    new_file.write('''Channel: SIP/%s/%s
 MaxRetries: 0
 Callerid: %s
 RetryTime: 20
@@ -30,7 +18,7 @@ WaitTime: 20
 Context: pa-system
 Extension: 10
 Priority: 1
-''' % (number, number))
+''' % (router_ip, number, number))
     os.chown('/var/spool/asterisk/outgoing/%s' % number, 995, 1000)
     logging.info( u'Call file for number %s was successfully created' % number)
 
@@ -45,7 +33,19 @@ def check_call_numbers():
     return int(out)
 
 
-def file_create_logic(phone_number, start_time, end_time):
+def get_router_ip(routers):
+    if routers['a'][1] == 2:
+        routers['a'][1] = 1
+        return (routers['a'][0], routers)
+    elif routers['a'][1] == 1:
+        routers['a'][1] = 0
+        return (routers['a'][0], routers)
+    elif routers['a'][1] == 0:
+        routers['a'][1] = 2
+        return (routers['b'][0], routers)
+
+
+def file_create_logic(phone_number, start_time, end_time, router_ip):
     if datetime.date.weekday(datetime.date.today()) > 4:
         start_time = 14
     while True:
@@ -59,21 +59,5 @@ def file_create_logic(phone_number, start_time, end_time):
                 time.sleep(2)
                 continue
             else:
-                create_call_file(phone_number)
+                create_call_file(phone_number, router_ip)
                 break
-
-
-def main_job(data_list):
-    global bad_numbers
-    global good_numbers
-    global data_list_len
-    data_list_len = len(data_list[0:])
-    while data_list[0] != "":
-        if int(len(data_list[0])) < 11:
-            logging.warning(u'Bad number %s' % data_list[0])
-            bad_numbers += 1
-            data_list.remove(data_list[0])
-        else:
-            file_create_logic(data_list[0], start_time, end_time)
-            good_numbers = good_numbers + 1
-            data_list.remove(data_list[0])

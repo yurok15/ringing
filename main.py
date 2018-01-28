@@ -8,11 +8,12 @@
 # email: yurok15@gmail.com
 # github: yurok15@gmail.com
 # Created date: Dec 26, 2017
-# Last modified: Jan 05, 2018
+# Last modified: Jan 28, 2018
 # Tested with : Python 2.7
-# Script Revision: 0.7
+# Script Revision: 0.8
 # Revision 0.6 threading and statistics was added
 # Revision 0.7 differrent router with cost was added
+# Revision 0.8 blacklist added
 ##########################################################
 
 
@@ -56,7 +57,7 @@ def net_thread():
         conn.close()
 
 
-def main_job(data_list):
+def main_job(data_list, blacklist):
     global bad_numbers
     global good_numbers
     global data_list_len
@@ -68,18 +69,30 @@ def main_job(data_list):
             bad_numbers += 1
             data_list.remove(data_list[0])
         else:
+            if data_list[0] in blacklist:
+                logging.warning(u'Number %s in blacklist' % data_list[0])
+                data_list.remove(data_list[0])
+                continue
             router_ip, routers = get_router_ip(routers)
             file_create_logic(data_list[0], start_time, end_time, router_ip)
             good_numbers = good_numbers + 1
             data_list.remove(data_list[0])
 
 
+def get_blacklist():
+    with open('blacklist') as blk:
+        read_data = blk.read()
+    blacklist = read_data.split()
+    return(blacklist)
+
+
 def main():
     with open(args.file_path) as file:
         read_data = file.read()
     data_list = read_data.split()
+    blacklist = get_blacklist()
     start_new_thread(net_thread, ())
-    start_new_thread(main_job(data_list), ())
+    start_new_thread(main_job(data_list, blacklist), ())
 
 
 if __name__ == "__main__":

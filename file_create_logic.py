@@ -3,7 +3,7 @@ import time
 import os
 import subprocess
 import logging
-import argparse
+
 
 logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s', filename="obzvon.log", level=logging.INFO)
 
@@ -33,16 +33,44 @@ def check_call_numbers():
     return int(out)
 
 
+#def get_router_ip(routers):
+#    if routers['a'][1] == 2:
+#        routers['a'][1] = 1
+#        return (routers['a'][0], routers)
+#    elif routers['a'][1] == 1:
+#        routers['a'][1] = 0
+#        return (routers['a'][0], routers)
+#    elif routers['a'][1] == 0:
+#        routers['a'][1] = 2
+#        return (routers['b'][0], routers)
+
+
 def get_router_ip(routers):
-    if routers['a'][1] == 2:
-        routers['a'][1] = 1
-        return (routers['a'][0], routers)
-    elif routers['a'][1] == 1:
-        routers['a'][1] = 0
-        return (routers['a'][0], routers)
-    elif routers['a'][1] == 0:
-        routers['a'][1] = 2
-        return (routers['b'][0], routers)
+    def check_all_routers_is_zero(routers):
+        for r in routers:
+            if routers[r][2] > 0:
+                return True
+        return False
+    def get_router_with_higher_value(routers):
+        a = 0
+        router = ""
+        for r in routers:
+            if routers[r][2] > a:
+                a = routers[r][2]
+                router = r
+                #print(r)
+        return router
+# Если значения все нулевые, то выставить из в дефолтные
+    if check_all_routers_is_zero(routers) is False:
+        # Установить все значения в дефолт
+        for r in routers:
+            routers[r][2] = routers[r][1]
+    else:
+        # Если значения не нулевые сортировка и возврат подходящего
+        router_ip = routers[get_router_with_higher_value(routers)][0]
+        cur_router = routers[get_router_with_higher_value(routers)]
+        routers[cur_router][2] = routers[cur_router][2] - 1
+    return (router_ip, routers)
 
 
 def file_create_logic(phone_number, start_time, end_time, router_ip):

@@ -32,7 +32,10 @@ args = parser.parse_args()
 
 start_time = args.start_time
 end_time = args.end_time
-routers = {'a': ['10.78.99.196', 2], 'b': ['10.78.99.195', 1]}
+routers = {
+    'a': ['10.78.99.196', 2],
+    'b': ['10.78.99.195', 1]
+}
 
 
 bad_numbers = 0

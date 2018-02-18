@@ -33,7 +33,7 @@ def check_call_numbers():
     return int(out)
 
 
-#def get_router_ip(routers):
+#def get_router_ip1(routers):
 #    if routers['a'][1] == 2:
 #        routers['a'][1] = 1
 #        return (routers['a'][0], routers)
@@ -58,27 +58,29 @@ def get_router_ip(routers):
             if routers[r][2] > a:
                 a = routers[r][2]
                 router = r
-                #print(r)
         return router
-# Если значения все нулевые, то выставить из в дефолтные
+
+    router_ip = routers[get_router_with_higher_value(routers)][0]
+    cur_router = get_router_with_higher_value(routers)
+    routers[cur_router][2] = int(routers[cur_router][2]) - 1
+
     if check_all_routers_is_zero(routers) is False:
-        # Установить все значения в дефолт
         for r in routers:
             routers[r][2] = routers[r][1]
-    else:
-        # Если значения не нулевые сортировка и возврат подходящего
-        router_ip = routers[get_router_with_higher_value(routers)][0]
-        cur_router = routers[get_router_with_higher_value(routers)]
-        routers[cur_router][2] = routers[cur_router][2] - 1
+
     return (router_ip, routers)
 
 
 def file_create_logic(phone_number, start_time, end_time, router_ip):
     if datetime.date.weekday(datetime.date.today()) > 4:
-        start_time = 14
+        start_time = 10
     while True:
         now = datetime.datetime.now()
-        if now.hour < start_time or now.hour > 19:
+
+        if now.hour < start_time or now.hour > end_time:
+            print now
+            print start_time
+            print end_time
             logging.warning( u'Bad time for customer call')
             time.sleep(600)
             continue

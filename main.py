@@ -17,7 +17,6 @@
 ##########################################################
 
 
-
 from thread import start_new_thread
 import argparse
 import socket
@@ -33,8 +32,8 @@ args = parser.parse_args()
 start_time = args.start_time
 end_time = args.end_time
 routers = {
-    'a': ['10.78.99.196', 2],
-    'b': ['10.78.99.195', 1]
+    'a': ['10.78.99.196', 2, 2],
+    'b': ['10.78.99.195', 1, 1]
 }
 
 
@@ -76,10 +75,12 @@ def main_job(data_list, blacklist):
                 logging.warning(u'Number %s in blacklist' % data_list[0])
                 data_list.remove(data_list[0])
                 continue
-            router_ip, routers = get_router_ip(routers)
-            file_create_logic(data_list[0], start_time, end_time, router_ip)
-            good_numbers = good_numbers + 1
-            data_list.remove(data_list[0])
+            else:
+                print(routers)
+                router_ip, routers = get_router_ip(routers)
+                file_create_logic(data_list[0], start_time, end_time, router_ip)
+                good_numbers = good_numbers + 1
+                data_list.remove(data_list[0])
 
 
 def get_blacklist():

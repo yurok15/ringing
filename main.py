@@ -32,20 +32,17 @@ args = parser.parse_args()
 start_time = args.start_time
 end_time = args.end_time
 routers = {
-    'a': ['10.78.99.196', 2, 2],
-    'b': ['10.78.99.195', 1, 1]
+    'a': ['10.78.99.196', 2, 2]
+#    'b': ['10.78.99.195', 1, 1]
 }
-
 
 bad_numbers = 0
 good_numbers = 0
 data_list_len = []
 
-
 sock = socket.socket()
 sock.bind(('127.0.0.1', 9090))
 sock.listen(1)
-
 
 def net_thread():
     global data_list_len
@@ -85,15 +82,15 @@ def main_job(data_list, blacklist):
 
 def get_blacklist():
     with open('blacklist') as blk:
-        read_data = blk.read()
-    blacklist = read_data.split()
+        blacklist = blk.read().split()
+    #blacklist = read_data.split()
     return(blacklist)
 
 
 def main():
     with open(args.file_path) as file:
-        read_data = file.read()
-    data_list = read_data.split()
+        data_list = file.read().split()
+    #data_list = read_data.split()
     blacklist = get_blacklist()
     start_new_thread(net_thread, ())
     start_new_thread(main_job(data_list, blacklist), ())

@@ -83,14 +83,12 @@ def main_job(data_list, blacklist):
 def get_blacklist():
     with open('blacklist') as blk:
         blacklist = blk.read().split()
-    #blacklist = read_data.split()
     return(blacklist)
 
 
 def main():
     with open(args.file_path) as file:
         data_list = file.read().split()
-    #data_list = read_data.split()
     blacklist = get_blacklist()
     start_new_thread(net_thread, ())
     start_new_thread(main_job(data_list, blacklist), ())
